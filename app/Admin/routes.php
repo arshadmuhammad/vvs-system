@@ -15,8 +15,7 @@ Route::group([
     $router->resource('products', ProductController::class);
     $router->resource('pins', PinController::class);
 
-
     $router->post('pins/csv/import', 'PinController@import');
-    $router->get('/pins/products', 'PinController@products');
+    //$router->get('/pins/products', 'PinController@products');
 
 });
