@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Extensions\Tools\ImportButton;
+use App\Admin\Forms\ImportPin;
 use App\Models\Pin;
 use App\Models\Product;
 use Encore\Admin\Controllers\AdminController;
@@ -130,5 +131,11 @@ class PinController extends AdminController
 //            }
         }
         return redirect('admin/pins');
+    }
+
+    public function importPin(Content $content){
+        return $content
+            ->title('Import PINs')
+            ->body(new ImportPin());
     }
 }
