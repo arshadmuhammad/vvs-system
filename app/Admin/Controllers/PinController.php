@@ -166,9 +166,9 @@ class PinController extends AdminController
         array_shift($csv);
 
         foreach ($csv as $row){
-            $pin          = $row[1];
-            $serial       = $row[2];
-            $expiryDate   = $row[3];
+            $pin          = $row[0];
+            $serial       = $row[1];
+            $expiryDate   = $row[2];
 
             $req = new Pin();
             $req->product_id = $productId;
