@@ -10,6 +10,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Layout\Content; // Add
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request; // Add
 use Encore\Admin\Widgets;
 
@@ -136,7 +137,7 @@ class PinController extends AdminController
     public function importPin(Content $content){
         $this->dumpRequest($content);
 
-        $content->title('Form 2');
+        $content->title('Import PINs');
 
         $form = new Widgets\Form();
 
@@ -152,13 +153,32 @@ class PinController extends AdminController
         })->rules('required')->ajax('/admin/productsresult');
         $form->file('csvfile', 'CSV File')->rules('mimes:csv|required');
 
-        $content->body(new Widgets\Box('Form-2', $form));
+        $content->body(new Widgets\Box('Import PINs', $form));
 
         return $content;
     }
 
     public function postImport(Request $request){
-        dump($request->all());
+        //dump($request->all());
+        $file = $request->file('csvfile');
+        $productId = $request->product_id;
+        $csv = array_map('str_getcsv', file($file));
+        array_shift($csv);
+
+        foreach ($csv as $row){
+            $productName  = $row[0];
+            $pin          = $row[1];
+            $serial       = $row[2];
+            $expiryDate   = $row[3];
+
+            $req = new Pin();
+            $req->product_id = $productId;
+            $req->pin = $pin;
+            $req->serial = $serial;
+            $req->expiry_date = date('Y-m-d h:i:s', strtotime($expiryDate));
+            $req->save();
+        }
+        return redirect('admin/import');
     }
 
     protected function dumpRequest(Content $content)
