@@ -3,7 +3,6 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Extensions\Tools\ImportButton;
-use App\Admin\Forms\ImportPin;
 use App\Models\Pin;
 use App\Models\Product;
 use Encore\Admin\Controllers\AdminController;
@@ -12,6 +11,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Layout\Content; // Add
 use Illuminate\Http\Request; // Add
+use Encore\Admin\Widgets;
 
 class PinController extends AdminController
 {
@@ -86,7 +86,7 @@ class PinController extends AdminController
             if ($product) {
                 return [$product->id => $product->name];
             }
-        })->ajax('/admin/pins/products');
+        })->ajax('/admin/productsresult');
         $form->text('pin', __('Pin'));
         $form->text('serial', __('Serial'));
         $form->datetime('expiry_date', __('Expiry date'))->default(date('Y-m-d H:i:s'));
@@ -134,8 +134,48 @@ class PinController extends AdminController
     }
 
     public function importPin(Content $content){
-        return $content
-            ->title('Import PINs')
-            ->body(new ImportPin());
+        $this->dumpRequest($content);
+
+        $content->title('Form 2');
+
+        $form = new Widgets\Form();
+
+        $form->method('post');
+        $form->action('import');
+
+        $form->select('product_id')->options(function ($id) {
+            $product = Product::find($id);
+
+            if ($product) {
+                return [$product->id => $product->name];
+            }
+        })->rules('required')->ajax('/admin/productsresult');
+        $form->file('csvfile', 'CSV File')->rules('mimes:csv|required');
+
+        $content->body(new Widgets\Box('Form-2', $form));
+
+        return $content;
+    }
+
+    public function postImport(Request $request){
+        dump($request->all());
+    }
+
+    protected function dumpRequest(Content $content)
+    {
+        $parameters = request()->except(['_pjax', '_token']);
+
+        if (!empty($parameters)) {
+
+            ob_start();
+
+            dump($parameters);
+
+            $contents = ob_get_contents();
+
+            ob_end_clean();
+
+            $content->row(new Widgets\Box('Form parameters', $contents));
+        }
     }
 }
