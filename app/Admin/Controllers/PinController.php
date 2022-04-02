@@ -42,6 +42,7 @@ class PinController extends AdminController
         $grid->column('expiry_date', __('Expiry date'));
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'));
+        $grid->column('updated_at', __('Sold at'));
 
         $grid->tools(function ($tools) {
             $tools->append(new ImportButton());
