@@ -118,18 +118,13 @@ class PinController extends AdminController
             $serial       = $row[2];
             $expiryDate   = $row[3];
 
-//            $question = \App\Models\Pin::where('id', $id)->first();
-//            if(!$question){
-                $req = new Pin();
-                $req->product_id = \App\Models\Product::where('name', $productName)->first()->id;
-                $req->pin = $pin;
-                $req->serial = $serial;
-                $req->expiry_date = date('Y-m-d h:i:s', strtotime($expiryDate));
-                $req->save();
-//            }else{
-//                $question->conetnt = $content;
-//                $question->save();
-//            }
+            $req = new Pin();
+            $req->product_id = \App\Models\Product::where('name', $productName)->first()->id;
+            $req->pin = $pin;
+            $req->serial = $serial;
+            $req->expiry_date = date('Y-m-d h:i:s', strtotime($expiryDate));
+            $req->save();
+
         }
         return redirect('admin/pins');
     }
