@@ -13,7 +13,7 @@ Route::group([
 
     $router->get('/', 'HomeController@index')->name('home');
     $router->resource('products', ProductController::class);
-    $router->resource('pins', PinController::class);
+    $router->resource('availible_pins', PinController::class);
 
     $router->post('pins/csv/import', 'PinController@import');
     $router->get('/import', 'PinController@importPin');
