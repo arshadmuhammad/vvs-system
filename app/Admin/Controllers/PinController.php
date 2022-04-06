@@ -129,7 +129,60 @@ class PinController extends AdminController
         return redirect('admin/pins');
     }
 
-    public function importPin(Content $content){
+    public function exportPin(Content $content): Content
+    {
+        $this->dumpRequest($content);
+
+        $content->title('Export PINs');
+
+        $form = new Widgets\Form();
+
+        $form->method('post');
+        $form->action('export');
+
+        $form->select('product_id')->options(function ($id) {
+            $product = Product::find($id);
+
+            if ($product) {
+                return [$product->id => $product->name];
+            }
+        })->rules('required')->ajax('/admin/productsresult');
+        //$form->display('available_qty', 'Available Qty');
+        $form->html('<h4 id="available_qty">Available Qty For Product: </h4>');
+
+        $form->text('qty', 'Select Qty')->rules('required');
+        $form->textarea('reference', 'Reference')->rules('required');
+
+
+        $content->body(new Widgets\Box('Export PINs', $form));
+
+        return $content;
+    }
+
+    public function postExport(Request $request){
+        //dump($request->all());
+//        $file = $request->file('csvfile');
+//        $productId = $request->product_id;
+//        $csv = array_map('str_getcsv', file($file));
+//        array_shift($csv);
+//
+//        foreach ($csv as $row){
+//            $pin          = $row[0];
+//            $serial       = $row[1];
+//            $expiryDate   = $row[2];
+//
+//            $req = new Pin();
+//            $req->product_id = $productId;
+//            $req->pin = $pin;
+//            $req->serial = $serial;
+//            $req->expiry_date = date('Y-m-d h:i:s', strtotime($expiryDate));
+//            $req->save();
+//        }
+        return redirect('admin/export');
+    }
+
+    public function importPin(Content $content): Content
+    {
         $this->dumpRequest($content);
 
         $content->title('Import PINs');
