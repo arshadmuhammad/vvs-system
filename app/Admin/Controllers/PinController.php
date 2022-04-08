@@ -150,7 +150,7 @@ class PinController extends AdminController
             }
         })->rules('required')->ajax('/admin/productsresult');
         //$form->display('available_qty', 'Available Qty');
-        $form->html('<h4 id="available_qty">Available Qty For Product: </h4>');
+        $form->html('<h4>Available Qty For Product: <span id="available_qty"></span></h4>');
 
         $form->text('qty', 'Select Qty')->rules('required');
         $form->textarea('reference', 'Reference')->rules('required');
@@ -255,5 +255,10 @@ class PinController extends AdminController
 
             $content->row(new Widgets\Box('Form parameters', $contents));
         }
+    }
+
+    public function productQty(Request $request){
+        $product_id = $request->get('product_id');
+        return Pin::where('product_id', $product_id)->count();
     }
 }

@@ -23,4 +23,6 @@ Route::group([
     $router->post('/export', 'PinController@postExport');
     $router->get('productsresult', 'PinController@products');
 
+    $router->get('product/qty', 'PinController@productQty');
+
 });
