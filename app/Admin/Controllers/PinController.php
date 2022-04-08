@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Admin\Extensions\Tools\ImportButton;
 use App\Models\Pin;
+use App\Models\SoldPin;
 use App\Models\Product;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
@@ -13,6 +14,7 @@ use Encore\Admin\Layout\Content; // Add
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request; // Add
 use Encore\Admin\Widgets;
+use Illuminate\Support\Facades\DB;
 
 class PinController extends AdminController
 {
@@ -161,23 +163,32 @@ class PinController extends AdminController
 
     public function postExport(Request $request){
         //dump($request->all());
-//        $file = $request->file('csvfile');
-//        $productId = $request->product_id;
-//        $csv = array_map('str_getcsv', file($file));
-//        array_shift($csv);
-//
-//        foreach ($csv as $row){
-//            $pin          = $row[0];
-//            $serial       = $row[1];
-//            $expiryDate   = $row[2];
-//
-//            $req = new Pin();
-//            $req->product_id = $productId;
-//            $req->pin = $pin;
-//            $req->serial = $serial;
-//            $req->expiry_date = date('Y-m-d h:i:s', strtotime($expiryDate));
-//            $req->save();
-//        }
+        $productId = $request->product_id;
+        $qty = $request->qty;
+        $pins = Pin::where('product_id', $productId)->limit($qty)->get();
+        $pinsArray = [];
+        try{
+            DB::beginTransaction();
+            foreach($pins as $pin){
+                $pinsArray[] = [
+                    'product_id' => $pin->product_id,
+                    'pin'       => $pin->pin,
+                    'serial' => $pin->serial,
+                    'expiry_date' => $pin->expiry_date,
+                    'sold_date' => now(),
+                    'reference' => $request->reference,
+                    'created_at' => date('Y-m-d h:i:s'),
+                    'updated_at' => date('Y-m-d h:i:s'),
+                ];
+                $pin->delete();
+            }
+            SoldPin::insert($pinsArray);
+            DB::commit();
+        }
+        catch(\Exception $exception){
+            DB::rollBack();
+        }
+
         return redirect('admin/export');
     }
 
