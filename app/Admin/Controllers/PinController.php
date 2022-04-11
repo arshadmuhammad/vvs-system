@@ -149,7 +149,6 @@ class PinController extends AdminController
                 return [$product->id => $product->name];
             }
         })->rules('required')->ajax('/admin/productsresult');
-        //$form->display('available_qty', 'Available Qty');
         $form->html('<h4>Available Qty For Product: <span id="available_qty"></span></h4>');
 
         $form->text('qty', 'Select Qty')->rules('required');

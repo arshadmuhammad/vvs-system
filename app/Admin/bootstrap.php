@@ -20,5 +20,5 @@
 Use Encore\Admin\Admin;
 
 Encore\Admin\Form::forget(['map', 'editor']);
-Admin::js('https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js');
-Admin::js('/admin/js/js.js');
+//Admin::js('https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js');
+//Admin::js('/admin/js/js.js');
