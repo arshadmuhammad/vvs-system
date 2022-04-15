@@ -45,6 +45,12 @@ class PinController extends AdminController
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'));
 
+        $grid->actions(function ($actions) {
+            $actions->disableDelete();
+            $actions->disableEdit();
+            $actions->disableView();
+        });
+
         $grid->tools(function ($tools) {
             $tools->append(new ImportButton());
         });
@@ -179,16 +185,47 @@ class PinController extends AdminController
                     'created_at' => date('Y-m-d h:i:s'),
                     'updated_at' => date('Y-m-d h:i:s'),
                 ];
-                $pin->delete();
+                //$pin->delete();
             }
-            SoldPin::insert($pinsArray);
+//            SoldPin::insert($pinsArray);
             DB::commit();
         }
         catch(\Exception $exception){
             DB::rollBack();
         }
 
-        return redirect('admin/export');
+        $fileName = 'tasks.csv';
+
+        $headers = array(
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        );
+
+        $columns = array('Product', 'Pin', 'Serial No', 'Expiry Date', 'Reference');
+
+        $callback = function() use($pinsArray, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($pinsArray as $task) {
+                $row['product_id']  = $task['product_id'];
+                $row['pin']    = $task['pin'];
+                $row['serial']    = $task['serial'];
+                $row['expiry_date']  = $task['expiry_date'];
+                $row['reference']  = $task['reference'];
+
+                fputcsv($file, array($row['product_id'], $row['pin'], $row['serial'], $row['expiry_date'], $row['reference']));
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+
+        //return redirect('admin/export');
     }
 
     public function importPin(Content $content): Content

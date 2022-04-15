@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Product;
 use App\Models\SoldPin;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
@@ -27,7 +28,10 @@ class SoldPinController extends AdminController
         $grid = new Grid(new SoldPin());
 
         $grid->column('id', __('Id'));
-        $grid->column('product_id', __('Product id'));
+        //$grid->column('product_id', __('Product id'));
+        $grid->column('product_id', __('Product Name'))->display(function($userId) {
+            return Product::find($userId)->name;
+        });
         $grid->column('pin', __('Pin'));
         $grid->column('serial', __('Serial'));
         $grid->column('expiry_date', __('Expiry date'));
@@ -35,6 +39,18 @@ class SoldPinController extends AdminController
         $grid->column('reference', __('Reference'));
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'));
+
+        $grid->actions(function ($actions) {
+            $actions->disableDelete();
+            $actions->disableEdit();
+            $actions->disableView();
+        });
+
+        $grid->filter(function ($filter) {
+
+            $filter->like('reference','Reference');
+
+        });
 
         return $grid;
     }
