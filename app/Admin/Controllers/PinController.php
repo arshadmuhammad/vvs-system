@@ -185,9 +185,9 @@ class PinController extends AdminController
                     'created_at' => date('Y-m-d h:i:s'),
                     'updated_at' => date('Y-m-d h:i:s'),
                 ];
-                //$pin->delete();
+                $pin->delete();
             }
-//            SoldPin::insert($pinsArray);
+            SoldPin::insert($pinsArray);
             DB::commit();
         }
         catch(\Exception $exception){
